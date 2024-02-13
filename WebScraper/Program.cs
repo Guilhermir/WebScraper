@@ -1,10 +1,6 @@
 ﻿using System;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
-using System.IO;
 using WebScraper.Classes;
+using WebScraper.Helpers;
 
 namespace WebScraper
 {
@@ -12,49 +8,26 @@ namespace WebScraper
     {
         static void Main()
         {
-            string projetoPath = Directory.GetCurrentDirectory(); // Obtém o diretório do projeto
-            string driverPath = GetChromeDriverPath(projetoPath);
-
-            var chromeOptions = new ChromeOptions();
-            IWebDriver driver = new ChromeDriver(driverPath, chromeOptions);
-
-            try
+            using (var webDriverHelper = new ChromeDriver())
             {
-                string url = "https://sisazul.sjp.pr.gov.br/webapp/portaltransparencia/despesas";
-                int ano = 2023; // Substitua pelo ano desejado
-                string mes = "Janeiro"; // Substitua pelo mês desejado
+                try
+                {
+                    // URL do site que será alvo do scraping
+                    string url = "https://sisazul.sjp.pr.gov.br/webapp/portaltransparencia/despesas";
 
-                // Criar uma instância do Scraper
-                var scraper = new Scraper(driver);
+                    // Ano e mês para os quais você deseja extrair dados
+                    int ano = 2023;
+                    string mes = "Janeiro";
 
-                // Executar o scraping
-                scraper.ExecutarScraping(url, ano, mes);
+                    var scraper = new Scraper(webDriverHelper.Driver);
 
-                // ...
+                    scraper.ExecutarScraping(url, ano, mes);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Ocorreu um erro: " + ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Ocorreu um erro: " + ex.Message);
-            }
-            finally
-            {
-                // Fechar o navegador após o scraping
-                driver.Quit();
-            }
-        }
-
-        static string GetChromeDriverPath(string projetoPath)
-        {
-            var driversPath = Path.Combine(projetoPath, "Drivers");
-            var chromeDriverPath = Path.Combine(driversPath, "chromedriver.exe");
-
-            if (!File.Exists(chromeDriverPath))
-            {
-                Console.WriteLine("O arquivo chromedriver.exe não foi encontrado. Certifique-se de que está na pasta 'Drivers'.");
-                // Pode adicionar lógica adicional aqui, como baixar o chromedriver automaticamente.
-            }
-
-            return driversPath;
         }
     }
 }

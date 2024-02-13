@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class DadosDespesa
+    public class Dados
     {
         public string Orgao { get; set; }
         public string Empenho { get; set; }
